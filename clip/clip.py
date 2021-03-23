@@ -130,10 +130,6 @@ def load(name: str, device: Union[str, torch.device] = "cuda" if torch.cuda.is_a
                 if "value" in node.attributeNames() and str(node["value"]).startswith("cuda"):
                     node.copyAttributes(device_node)
 
-    model.apply(patch_device)
-    patch_device(model.encode_image)
-    patch_device(model.encode_text)
-
     # patch dtype to float32 on CPU
     if str(device) == "cpu":
         float_holder = torch.jit.trace(lambda: torch.ones([]).float(), example_inputs=[])
@@ -151,12 +147,6 @@ def load(name: str, device: Union[str, torch.device] = "cuda" if torch.cuda.is_a
                     for i in [1, 2]:  # dtype can be the second or third argument to aten::to()
                         if inputs[i].node()["value"] == 5:
                             inputs[i].node().copyAttributes(float_node)
-
-        model.apply(patch_float)
-        patch_float(model.encode_image)
-        patch_float(model.encode_text)
-
-        model.float()
 
     return model, _transform(model.input_resolution.item())
 
