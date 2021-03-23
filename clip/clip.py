@@ -3,6 +3,8 @@ import os
 import urllib
 import warnings
 from typing import Union, List
+from vision_transformer_pytorch import VisionTransformer
+
 
 import torch
 from PIL import Image
@@ -99,7 +101,7 @@ def load(name: str, device: Union[str, torch.device] = "cuda" if torch.cuda.is_a
 
     try:
         # loading JIT archive
-        model = torch.jit.load(model_path, map_location=device if jit else "cpu").eval()
+        model = VisionTransformer.from_pretrained('ViT-B_16')
         state_dict = None
     except RuntimeError:
         # loading saved state dict
